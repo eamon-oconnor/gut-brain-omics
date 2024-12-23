@@ -24,14 +24,16 @@ def retrieve_mesh_id(mesh_descriptor):
         data = response.json()
 
         # Check if the descriptor was found and retrieve the MeSH ID
-        if 'resource' in data[0]:
+        if len(data)>0 and 'resource' in data[0]:
             mesh_url = data[0]['resource']
             mesh_id = mesh_url[-7:]
             return mesh_id
         else:
-            return f"No MeSH ID found for descriptor: {mesh_descriptor}"
+            print(f"No MeSH ID found for descriptor: {mesh_descriptor}")
+            return None
     else:
-        return f"Error: {response.status_code}"
+        print(f"Error: {response.status_code}")
+        return None
 
 
 def retrieve_mesh_descriptor(mesh_id):
@@ -52,13 +54,22 @@ def retrieve_mesh_descriptor(mesh_id):
         data = response.json()
 
         # Retrieve the MeSH ID
-        mesh_descriptor = data[0]
-        return mesh_descriptor
+        if len(data) > 0:
+            mesh_descriptor = data[0]
+            return mesh_descriptor
+        else:
+            print(f"MeSH ID {mesh_id} not found")
+            return None
     else:
-        return f"Error: {response.status_code}"
+        print(f"Error: {response.status_code}")
+        return None
 
 
-def retrieve_tax_id()
+def retrieve_tax_id():
+    """
+    Retrieves NIH taxonomy ID of species/genus from name
+    @param
+    """
 
 
 def retrieve_data(mesh_id, tax_id):
