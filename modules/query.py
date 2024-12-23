@@ -3,6 +3,7 @@ docstring
 """
 import json
 import requests
+import sys
 
 
 def retrieve_mesh_id(mesh_descriptor):
@@ -58,18 +59,34 @@ def retrieve_mesh_descriptor(mesh_id):
             mesh_descriptor = data[0]
             return mesh_descriptor
         else:
-            print(f"MeSH ID {mesh_id} not found")
+            print(f"MeSH ID \'{mesh_id}\' not found")
             return None
     else:
         print(f"Error: {response.status_code}")
         return None
 
 
-def retrieve_tax_id():
+def retrieve_tax_info(tax_in):
     """
-    Retrieves NIH taxonomy ID of species/genus from name
-    @param
+    Retrieves NIH taxonomy ID and name of species/genus
+    @param tax_in: Scientific name or NIH tax ID of species/genus
+    @return tax_id: NIH taxonomy ID of species/genus
+    @return tax_name: Scientific name of species/genus
     """
+ 
+    server = "https://rest.ensembl.org"
+    ext = "/taxonomy/id/9606?"
+    
+    r = requests.get(server+ext, headers={ "Content-Type" : "application/json"})
+    
+    if not r.ok:
+        r.raise_for_status()
+        sys.exit()
+    
+    decoded = r.json()
+    print(repr(decoded))
+
+
 
 
 def retrieve_data(mesh_id, tax_id):

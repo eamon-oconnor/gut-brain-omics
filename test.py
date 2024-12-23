@@ -1,38 +1,28 @@
-import requests
+import requests,sys
 
-def retrieve_mesh_id(mesh_descriptor):
+def retrieve_tax_info(tax_in):
     """
-    Retrives MeSH phenotype id from descriptive name
-    @param mesh_descriptor: Descriptive name of phenotype (Depression, Anxiety, etc.)
-    @return mesh_id: MeSH ID of phenotype
+    Retrieves NIH taxonomy ID and name of species/genus
+    @param tax_in: Scientific name or NIH tax ID of species/genus
+    @return tax_id: NIH taxonomy ID of species/genus
+    @return tax_name: Scientific name of species/genus
     """
-
-    # Base URL for MeSH Lookup API
-    base_url = "https://id.nlm.nih.gov/mesh/lookup/descriptor"
-
-    # Send a GET request to the API with the descriptor name
-    response = requests.get(base_url, params={'label': mesh_descriptor})
-
+ 
+    server = "https://rest.ensembl.org"
+    ext = "/taxonomy/id/"+str(tax_in)+"?"
+    
+    response = requests.get(server+ext, headers={ "Content-Type" : "application/json"})
+    
     # Check if the response status is OK
     if response.status_code == 200:
-        # Parse the response JSON
-        data = response.json()
+        decoded = response.json()
+        tax_name = decoded['name']
+        tax_id = decoded['id']
 
-        # Check if the descriptor was found and retrieve the MeSH ID
-        if 'resource' in data[0]:
-            mesh_url = data[0]['resource']
-            mesh_id = mesh_url[-7:]
-            return mesh_id
-        else:
-            print(f"No MeSH ID found for descriptor: {mesh_descriptor}")
-            return None
+        return(tax_name, tax_id)
+
     else:
-        print(f"Error: {response.status_code}")
+        print(f'NIH Taxonomy ID or name \'{tax_in}\' not found.')
         return None
 
-
-# Example usage
-descriptor = "Depresion"
-mesh_id = 'D00363'
-mesh_id = retrieve_mesh_id(descriptor)
-print(f"MeSH ID for '{descriptor}': {mesh_id}")
+print(retrieve_tax_info('homo sapiens'))
