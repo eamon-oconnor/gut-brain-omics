@@ -75,18 +75,20 @@ def retrieve_tax_info(tax_in):
     """
  
     server = "https://rest.ensembl.org"
-    ext = "/taxonomy/id/9606?"
+    ext = "/taxonomy/id/"+str(tax_in)+"?"
     
-    r = requests.get(server+ext, headers={ "Content-Type" : "application/json"})
+    response = requests.get(server+ext, headers={ "Content-Type" : "application/json"})
     
-    if not r.ok:
-        r.raise_for_status()
-        sys.exit()
-    
-    decoded = r.json()
-    print(repr(decoded))
+    # Check if the response status is OK
+    if response.status_code == 200:
+        decoded = response.json()
+        tax_name = decoded['name']
+        tax_id = decoded['id']
 
-
+        return(tax_name, tax_id)
+    else:
+        print(f'NIH Taxonomy ID or name \'{tax_in}\' not found.')
+        return None
 
 
 def retrieve_data(mesh_id, tax_id):
