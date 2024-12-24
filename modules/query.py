@@ -107,10 +107,8 @@ def retrieve_data(mesh_id, tax_id):
 
     # Select disease abundance data
     disease_data = pd.DataFrame(data.json().get('abundant_data_for_disease'))
-    list(disease_data)
 
     # Select health abundance data
     health_data = pd.DataFrame(data.json().get('abundant_data_for_health'))
-    list(health_data)
 
-    return(disease_data, health_data)
+    return(disease_data.values.flatten(), health_data.values.flatten())
