@@ -3,7 +3,7 @@ docstring
 """
 import json
 import requests
-import sys
+import pandas as pd
 
 
 def retrieve_mesh_id(mesh_descriptor):
@@ -85,7 +85,7 @@ def retrieve_tax_info(tax_in):
         tax_name = decoded['name']
         tax_id = decoded['id']
 
-        return(tax_name, tax_id)
+        return(tax_id, tax_name)
     else:
         print(f'NIH Taxonomy ID or name \'{tax_in}\' not found.')
         return None
@@ -96,19 +96,21 @@ def retrieve_data(mesh_id, tax_id):
     Retrieves gut microbiome abundance data of given species/genus associated with given phenotype (courtesy of GMrepo)
     @param mesh_id: MeSH ID of phenotype (see NIH)
     @param tax_id: NCBI taxonomy ID of species/genus
-    @return data: list containing following dataframes:
-        hist_data_for_phenotype: relative abundances of the species/genus of interests in all samples of phenotype (dataframe)
-        hist_data_for_health: relative abundances of the species/genus of interests in all samples of Health (dataframe)
-        abundant_data_for_disease: relative abundances of the species/genus of interests in all samples of phenotype (vector)
-        abundant_data_for_health: relative abundances of the species/genus of interests in all samples of Health (vector)
-        taxon: NCBI taxonomy information
-        disease: details of current phenotype
-        abundance_and_meta_data: runs in which current taxon is found and related meta data
-        co_occurred_taxa: cooccurred taxa of the taxon of interests in current phenotype
+    @return disease_data: relative abundances of the species/genus of interests in all samples of phenotype (vector)
+    @return health_data: relative abundances of the species/genus of interests in all samples of Health (vector)
     """
 
+    # Retrieve dataset from GMrepo
     data_query = {'mesh_id': mesh_id,"ncbi_taxon_id" : tax_id}
     url = 'https://gmrepo.humangut.info/api/getMicrobeAbundancesByPhenotypeMeshIDAndNCBITaxonID'
     data = requests.post(url, data=json.dumps(data_query))
 
-    return data
+    # Select disease abundance data
+    disease_data = pd.DataFrame(data.json().get('abundant_data_for_disease'))
+    list(disease_data)
+
+    # Select health abundance data
+    health_data = pd.DataFrame(data.json().get('abundant_data_for_health'))
+    list(health_data)
+
+    return(disease_data, health_data)
