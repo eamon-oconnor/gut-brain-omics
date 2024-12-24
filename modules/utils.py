@@ -5,6 +5,7 @@ import pandas as pd
 import statistics
 from . import query
 import scipy.stats as sci_stats 
+import matplotlib.pyplot as plt
 
 
 def df_to_list(df):
@@ -34,10 +35,14 @@ def stats(data):
     return mean, st_dev
     
 
-def hist():
+def hist(disease_data, health_data, pheno_label, tax_label):
     """
     
     """
+    plt.hist(disease_data,bins=100)
+    plt.hist(health_data,bins=100)
+
+    plt.show()
 
 
 def test_pheno_genus(mesh_id, mesh_label, tax_id, tax_label):
@@ -53,16 +58,17 @@ def test_pheno_genus(mesh_id, mesh_label, tax_id, tax_label):
     # Retrieve data
     disease_data, health_data = query.retrieve_data(mesh_id, tax_id)
 
-    print(disease_data)
     # Calculate means and standard deviations
     disease_mean, disease_stdev = stats(disease_data)
     health_mean, health_stdev = stats(health_data)
 
     # Perform Welch t-test
-    p_value = sci_stats.ttest_ind(disease_data, health_data, equal_var = False)
+    p_value = sci_stats.ttest_ind(disease_data, health_data, equal_var = False, alternative='less').pvalue
+
+    # Generate histogram
+    hist(disease_data, health_data, mesh_label, tax_label)
 
     # Print stats
-    print(f'The mean relative abundance of {tax_label} in the {mesh_label} group is {disease_mean},\
-          with a standard deviation of {disease_stdev}.')
-    print(f'A Welch\'s t-test of {tax_label} abundance between the {mesh_label} group and \
-          healthy group produced a p-value of {p_value}.')
+    print(f'The mean relative abundance of {tax_label} in the {mesh_label} group is {round(disease_mean,3)}, with a standard deviation of {round(disease_stdev,3)}.')
+    print(f'The mean relative abundance of {tax_label} in the health group is {round(health_mean,3)}, with a standard deviation of {round(health_stdev,3)}.')
+    print(f'A Welch\'s t-test of {tax_label} abundance between the {mesh_label} group and healthy group produced a p-value of {p_value:.3e}.')
