@@ -23,7 +23,7 @@ def df_to_list(df):
     return csv_dict
 
 
-def transform(data):
+def transform(data, type):
     """
     
     """
