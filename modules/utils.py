@@ -35,17 +35,17 @@ def stats(data):
     return mean, st_dev
     
 
-def hist(disease_data, health_data, pheno_label, tax_label):
+def hist(disease_data, health_data, pheno_label, tax_label, out_dir):
     """
     
     """
     plt.hist(disease_data,bins=100)
-    plt.hist(health_data,bins=100)
+    #plt.hist(health_data,bins=100)
 
-    plt.show()
+    #plt.show()
+    plt.savefig(out_dir+'/fig.png')
 
-
-def test_pheno_genus(mesh_id, mesh_label, tax_id, tax_label):
+def test_pheno_genus(mesh_id, mesh_label, tax_id, tax_label, out_dir):
     """
     Main function. Pull data from GMrepo for given mesh/tax, print stats, make hist
     @param mesh_id: NIH MeSH ID of phenotype
@@ -66,7 +66,7 @@ def test_pheno_genus(mesh_id, mesh_label, tax_id, tax_label):
     p_value = sci_stats.ttest_ind(disease_data, health_data, equal_var = False, alternative='less').pvalue
 
     # Generate histogram
-    hist(disease_data, health_data, mesh_label, tax_label)
+    hist(disease_data, health_data, mesh_label, tax_label, out_dir)
 
     # Print stats
     print(f'The mean relative abundance of {tax_label} in the {mesh_label} group is {round(disease_mean,3)}, with a standard deviation of {round(disease_stdev,3)}.')
