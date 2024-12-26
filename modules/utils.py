@@ -1,11 +1,12 @@
 """
 docstring placeholder
 """
-import pandas as pd
+import numpy as np
 import statistics
 from . import query
 import scipy.stats as sci_stats 
 import matplotlib.pyplot as plt
+import random
 
 
 def df_to_list(df):
@@ -20,6 +21,14 @@ def df_to_list(df):
         csv_dict[column] = data
     
     return csv_dict
+
+
+def transform(data):
+    """
+    
+    """
+    log_data = np.log(data)
+    return log_data
 
 
 def stats(data):
@@ -39,11 +48,26 @@ def hist(disease_data, health_data, pheno_label, tax_label, out_dir):
     """
     
     """
-    plt.hist(disease_data,bins=100)
-    #plt.hist(health_data,bins=100)
+    #health_adj = random.sample(sorted(health_data), len(disease_data))
+
+    fig, (ax1, ax2) = plt.subplots(2, sharex=True)
+
+    ax1.hist(disease_data,
+             label=pheno_label,
+             bins=20,
+             color='red')
+    
+    ax2.hist(health_data,
+             label='health',
+             bins=20,
+             color='yellow')
+    
+    plt.legend()
 
     #plt.show()
-    plt.savefig(out_dir+'/fig.png')
+    plt.savefig(out_dir+'/fig.png',
+                dpi=300)
+
 
 def test_pheno_genus(mesh_id, mesh_label, tax_id, tax_label, out_dir):
     """
@@ -58,6 +82,17 @@ def test_pheno_genus(mesh_id, mesh_label, tax_id, tax_label, out_dir):
     # Retrieve data
     disease_data, health_data = query.retrieve_data(mesh_id, tax_id)
 
+    # Find sample sizes
+    disease_n = len(disease_data)
+    health_n = len(health_data)
+
+    # Transformation
+    disease_data = transform(disease_data)
+    health_data = transform(health_data)
+    #disease_data, disease_lambda = sci_stats.boxcox(disease_data)
+    #health_data, health_lambda = sci_stats.boxcox(health_data)
+
+
     # Calculate means and standard deviations
     disease_mean, disease_stdev = stats(disease_data)
     health_mean, health_stdev = stats(health_data)
@@ -69,6 +104,7 @@ def test_pheno_genus(mesh_id, mesh_label, tax_id, tax_label, out_dir):
     hist(disease_data, health_data, mesh_label, tax_label, out_dir)
 
     # Print stats
+    print(f'The sample size in the {mesh_label} group is {disease_n}, while that of the health group is {health_n}.')
     print(f'The mean relative abundance of {tax_label} in the {mesh_label} group is {round(disease_mean,3)}, with a standard deviation of {round(disease_stdev,3)}.')
     print(f'The mean relative abundance of {tax_label} in the health group is {round(health_mean,3)}, with a standard deviation of {round(health_stdev,3)}.')
     print(f'A Welch\'s t-test of {tax_label} abundance between the {mesh_label} group and healthy group produced a p-value of {p_value:.3e}.')
