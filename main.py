@@ -10,7 +10,12 @@ import statsmodels.api as sm
 import pylab as py 
 
 
-def test_pheno_genus(mesh_id, mesh_label, tax_id, tax_label, transformation, out_dir):
+def test_pheno_genus(mesh_id,
+                     mesh_label,
+                     tax_id, tax_label,
+                     transformation,
+                     alternative,
+                     out_dir):
     """
     Pull data from GMrepo for given mesh/tax, print stats, make hist
     @param mesh_id: NIH MeSH ID of phenotype
@@ -18,6 +23,7 @@ def test_pheno_genus(mesh_id, mesh_label, tax_id, tax_label, transformation, out
     @param tax_id: NIH taxonomy ID of species/genus
     @param tax_label: Scientific name of species/genus
     @param transformation: Type of transformation to apply to data. Expects 'log10', 'ln', 'boxcox'
+    @param alternative: Alternative hypothesis of comparison
     @param out_dir: directory to write plots to
     @return None
     """
@@ -40,10 +46,10 @@ def test_pheno_genus(mesh_id, mesh_label, tax_id, tax_label, transformation, out
     health_mean, health_stdev = utils.basic_stats(health_data)
 
     # Perform Welch t-test
-    p_welch = stats.ttest_ind(disease_norm, health_norm, equal_var = False, alternative='greater').pvalue
+    p_welch = stats.ttest_ind(disease_norm, health_norm, equal_var = False, alternative=alternative).pvalue
     
     # Mann Whitney U Test
-    p_mw = stats.mannwhitneyu(disease_data, health_data).pvalue
+    p_mw = stats.mannwhitneyu(disease_data, health_data, alternative=alternative).pvalue
 
     # Generate histogram
     utils.hist(disease_norm, health_norm, mesh_label, tax_label, out_dir)
