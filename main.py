@@ -23,7 +23,7 @@ def test_pheno_genus(mesh_id,
     @param tax_id: NIH taxonomy ID of species/genus
     @param tax_label: Scientific name of species/genus
     @param transformation: Type of transformation to apply to data. Expects 'log10', 'ln', 'boxcox'
-    @param alternative: Alternative hypothesis of comparison
+    @param alternative: Alternative hypothesis of comparison. Expects 'two-sided', 'greater', 'less'
     @param out_dir: directory to write plots to
     @return None
     """
@@ -34,12 +34,16 @@ def test_pheno_genus(mesh_id,
     disease_norm = utils.transform(disease_data, transformation)
     health_norm = utils.transform(health_data, transformation)
 
+    # Generate plot filenames
+    fh_disease = tax_label.replace(" ", "-").lower()+'_'+mesh_label.replace(" ", "-").lower()
+    fh_health = tax_label.replace(" ", "-").lower()+'_health'
+
     # QQ Plots to check Normality
     sm.qqplot(health_norm, line ='45')
-    py.savefig(out_dir+'/qq_health.png', dpi=300)
+    py.savefig(out_dir+'/qq/'+fh_health+'.png', dpi=300)
     py.clf()
     sm.qqplot(disease_norm, line ='45')
-    py.savefig(out_dir+'/qq_pheno.png', dpi=300)
+    py.savefig(out_dir+'/qq/'+fh_disease+'.png', dpi=300)
 
     # Calculate means and standard deviations
     disease_mean, disease_stdev = utils.basic_stats(disease_data)
@@ -77,8 +81,9 @@ def get_fh_argparse():
         "--infile",
         dest="infile",
         type=str,
-        help="Path to file to open",
+        help="Path to CSV file to open",
         required=False,
+        default=None
     )
 
     parser.add_argument(
@@ -88,6 +93,7 @@ def get_fh_argparse():
         type=str,
         help="Phenotype to analyze",
         required=False,
+        default=None
     )
 
     parser.add_argument(
@@ -97,6 +103,7 @@ def get_fh_argparse():
         type=str,
         help="Genus or species to analyze",
         required=False,
+        default=None
     )
 
     parser.add_argument(
@@ -108,18 +115,45 @@ def get_fh_argparse():
         required=True,
     )
 
+    parser.add_argument(
+        "-t",
+        "--transformation",
+        dest="transformation",
+        type=str,
+        help="Transformation type for normalization. Options are 'boxcox', 'log10', 'ln', and 'None'",
+        required=False,
+        default='boxcox'
+    )
+
+    parser.add_argument(
+        "-a",
+        "--alternative",
+        dest="alternative",
+        type=str,
+        help="Alternative hypothesis for comparison between phenotype and health groups. Options are 'two-sided', 'greater', 'less'",
+        required=False,
+        default='two-sided'
+    )
+
     # Execute parse_args() method
     return parser.parse_args()
 
 
 def main():
-    """ main """
+    """main"""
 
-    # Get infile and out directory from cdl
+    # Get args from cdl
     args = get_fh_argparse()
-    if args.infile():
-        csv_fh = args.infile
-    result_dir = args.outdir
+    
+    # Set arguments to variables
+    csv = args.infile
+    pheno = args.phenotype
+    genus = args.genus
+    outdir = args.outdir
+    transf = args.transformation
+    alt = args.alternative
+    
+    
 
     # Convert csv to df
     df = pd.read_csv(csv_fh)

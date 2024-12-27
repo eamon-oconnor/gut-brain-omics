@@ -25,7 +25,7 @@ def transform(data, transformation):
     """
     Transform heavily right skewed data to normal distribution.
     @param data: sequence of data to transform
-    @param transformation: Type of transformation. Expects 'log10', 'ln', 'boxcox'
+    @param transformation: Type of transformation. Expects 'log10', 'ln', 'boxcox', 'None'
     @return data_transformed: sequence of data with given transformation applied
     """
     # Apply appropriate transformation based on input
@@ -35,6 +35,8 @@ def transform(data, transformation):
         data_transformed = np.log(data)
     elif transformation == 'boxcox':
         data_transformed, data_lambda = stats.boxcox(data)
+    elif transformation == None:
+        data_transformed=data
     else:
         print(f'Invalid transformation type \'{transformation}\'')
         return None
@@ -62,7 +64,7 @@ def hist(disease_data, health_data, pheno_label, tax_label, out_dir):
     @param health_data: Data of health group to be plotted
     @param pheno_label: Phenotype of disease group
     @param tax_label: Genus of abundance data
-    @out_dir: Directory to save histogram to
+    @param out_dir: Directory to save histogram to
     @return None
     """
     # Initialize panels
@@ -72,17 +74,20 @@ def hist(disease_data, health_data, pheno_label, tax_label, out_dir):
     ax1.hist(disease_data,
              label=pheno_label,
              bins=20,
-             color='red')
+             color='tab:cyan')
     
     # Plot health data
     ax2.hist(health_data,
-             label='health',
+             label='Health',
              bins=20,
-             color='yellow')
+             color='tab:red')
     
     # Add legend
     ax1.legend()
     ax2.legend()
 
+    # Generate plot filename
+    fh_hist = tax_label.replace(" ", "-").lower()+'_'+pheno_label.replace(" ", "-").lower()
+
     # Save figure
-    plt.savefig(out_dir+'/fig.png', dpi=300)
+    plt.savefig(out_dir+'/hist/'+fh_hist+'.png', dpi=300)
