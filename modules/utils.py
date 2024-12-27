@@ -57,30 +57,38 @@ def basic_stats(data):
     return mean, st_dev
     
 
-def hist(disease_data, health_data, pheno_label, tax_label, out_dir):
+def hist(disease_data, health_data, pheno_label, tax_label, transformation, out_dir):
     """
     Generates stacked histogram of disease and healthy data
     @param disease_data: Data of disease group to be plotted
     @param health_data: Data of health group to be plotted
     @param pheno_label: Phenotype of disease group
     @param tax_label: Genus of abundance data
+    @param transformation: Type of data transformation
     @param out_dir: Directory to save histogram to
     @return None
     """
     # Initialize panels
     fig, (ax1, ax2) = plt.subplots(2, sharex=True)
+    fig.suptitle('Relative Abundance of '+tax_label+' in the Gut Microbiome')
 
     # Plot disease data
     ax1.hist(disease_data,
              label=pheno_label,
              bins=20,
-             color='tab:cyan')
-    
+             color='tab:red')
+    ax1.set_ylabel('Frequency')
+
     # Plot health data
     ax2.hist(health_data,
              label='Health',
              bins=20,
-             color='tab:red')
+             color='tab:cyan')
+    if transformation == None:
+        ax2.set_xlabel('Relative Abundance')
+    else:
+        ax2.set_xlabel('Relative Abundance ('+transformation+' transformation)')
+    ax2.set_ylabel('Frequency')
     
     # Add legend
     ax1.legend()
@@ -90,4 +98,4 @@ def hist(disease_data, health_data, pheno_label, tax_label, out_dir):
     fh_hist = tax_label.replace(" ", "-").lower()+'_'+pheno_label.replace(" ", "-").lower()
 
     # Save figure
-    plt.savefig(out_dir+'/hist/'+fh_hist+'.png', dpi=300)
+    plt.savefig(out_dir+'/'+fh_hist+'_hist.png', dpi=300)

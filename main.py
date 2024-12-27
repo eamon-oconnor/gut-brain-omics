@@ -40,10 +40,10 @@ def test_pheno_genus(mesh_id,
 
     # QQ Plots to check Normality
     sm.qqplot(health_norm, line ='45')
-    py.savefig(out_dir+'/qq/'+fh_health+'.png', dpi=300)
+    py.savefig(out_dir+'/'+fh_health+'_qq.png', dpi=300)
     py.clf()
     sm.qqplot(disease_norm, line ='45')
-    py.savefig(out_dir+'/qq/'+fh_disease+'.png', dpi=300)
+    py.savefig(out_dir+'/'+fh_disease+'_qq.png', dpi=300)
 
     # Calculate means and standard deviations
     disease_mean, disease_stdev = utils.basic_stats(disease_data)
@@ -56,7 +56,7 @@ def test_pheno_genus(mesh_id,
     p_mw = stats.mannwhitneyu(disease_data, health_data, alternative=alternative).pvalue
 
     # Generate histogram
-    utils.hist(disease_norm, health_norm, mesh_label, tax_label, out_dir)
+    utils.hist(disease_norm, health_norm, mesh_label, tax_label, transformation, out_dir)
 
     # Print stats
     print(f'The mean relative abundance of {tax_label} in the {mesh_label} group is {round(disease_mean,3)}, with a standard deviation of {round(disease_stdev,3)}.')
