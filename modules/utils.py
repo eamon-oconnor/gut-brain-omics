@@ -75,14 +75,14 @@ def hist(disease_data, health_data, pheno_label, tax_label, transformation, out_
     # Plot disease data
     ax1.hist(disease_data,
              label=pheno_label,
-             bins=30,
+             bins=20,
              color='tab:red')
     ax1.set_ylabel('Frequency')
 
     # Plot health data
     ax2.hist(health_data,
              label='Health',
-             bins=30,
+             bins=20,
              color='tab:cyan')
     if transformation == None:
         ax2.set_xlabel('Relative Abundance')

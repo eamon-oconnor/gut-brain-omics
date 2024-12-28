@@ -40,9 +40,13 @@ def test_pheno_genus(mesh_id,
 
     # QQ Plots to check Normality
     sm.qqplot(health_norm, line ='45')
+    py.title('Q-Q Plot: ' + tax_label + ", Health")
     py.savefig(out_dir+'/'+fh_health+'_qq.png', dpi=300)
+    
     py.clf()
+    
     sm.qqplot(disease_norm, line ='45')
+    py.title('Q-Q Plot: ' + tax_label + ", " + mesh_label)
     py.savefig(out_dir+'/'+fh_disease+'_qq.png', dpi=300)
 
     # Calculate means and standard deviations
