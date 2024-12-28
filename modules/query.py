@@ -88,7 +88,7 @@ def retrieve_tax_info(tax_in):
         return(tax_id, tax_name)
     else:
         print(f'NIH Taxonomy ID or name \'{tax_in}\' not found.')
-        return None
+        return None, None
 
 
 def retrieve_data(mesh_id, tax_id):
@@ -105,10 +105,16 @@ def retrieve_data(mesh_id, tax_id):
     url = 'https://gmrepo.humangut.info/api/getMicrobeAbundancesByPhenotypeMeshIDAndNCBITaxonID'
     data = requests.post(url, data=json.dumps(data_query))
 
-    # Select disease abundance data
-    disease_data = pd.DataFrame(data.json().get('abundant_data_for_disease'))
+    # Check if the response status is OK
+    if data.status_code == 200:
 
-    # Select health abundance data
-    health_data = pd.DataFrame(data.json().get('abundant_data_for_health'))
+        # Select disease abundance data
+        disease_data = pd.DataFrame(data.json().get('abundant_data_for_disease'))
 
-    return(disease_data.values.flatten(), health_data.values.flatten())
+        # Select health abundance data
+        health_data = pd.DataFrame(data.json().get('abundant_data_for_health'))
+
+        return(disease_data.values.flatten(), health_data.values.flatten())
+
+    else:
+        return None

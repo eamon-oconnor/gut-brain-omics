@@ -30,6 +30,10 @@ def test_pheno_genus(mesh_id,
     # Retrieve data
     disease_data, health_data = query.retrieve_data(mesh_id, tax_id)
 
+    # Break if data unable to be retrieved
+    if disease_data is None or health_data is None:
+        return None
+
     # Normal Transformation
     disease_norm = utils.transform(disease_data, transformation)
     health_norm = utils.transform(health_data, transformation)

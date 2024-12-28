@@ -15,6 +15,7 @@ def df_to_list(df):
     """
     csv_dict = {}
 
+    # Loop through dataframe
     for column, data in df.iteritems():
         csv_dict[column] = data
     
