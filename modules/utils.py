@@ -16,7 +16,7 @@ def df_to_dict(data):
     """
     csv_dict = {}
 
-    df
+    df = pd.DataFrame(data)
 
     # Loop through dataframe
     for column, data in df.iteritems():

@@ -74,6 +74,44 @@ def test_pheno_genus(mesh_id,
     print(f'A Mann-Whitney U test of {tax_label} abundance between the {mesh_label} group and healthy group produced a p-value of {p_mw:.3e}.')
 
 
+def pull_mesh(mesh):
+    """
+    Pulls MeSH ID & label from API given either ID or label. Nested if/else and try/except structure to reduce superfluous API requests
+    @param mesh: MeSH ID or label
+    @return mesh_id: MeSH ID
+    @return mesh_label: MeSH label
+    """
+    # Test for MeSH ID characteristics
+    if len(mesh) == 7 and mesh[0] == 'D':
+        # Likely MeSH ID input
+        try:
+            mesh_label = query.retrieve_mesh_descriptor(mesh)
+            mesh_id = mesh
+        except:
+            # Try MeSH label
+            try:
+                mesh_id = query.retrieve_mesh_id(mesh)
+                mesh_label = mesh
+            except:
+                print(f'Invalid MeSH label or ID')
+                sys.exit()
+    else:
+        # Likely MeSH label input
+        try:
+            mesh_id = query.retrieve_mesh_id(mesh)
+            mesh_label = mesh
+        except:
+            # Try MeSH ID
+            try:
+                mesh_label = query.retrieve_mesh_descriptor(mesh)
+                mesh_id = mesh
+            except:
+                print(f'Invalid MeSH label or ID')
+                sys.exit()
+    
+    return mesh_id, mesh_label
+
+
 def process_csv(csv):
     """
     Loop through given CSV, analyze contained phenotypes and genera
@@ -206,17 +244,11 @@ def main():
     # Process input Pheno/Genus pair
     if is_pg == True:
         # Pull mesh id and label
-        #try:
-        #    mesh_id = query.retrieve_mesh_id(pheno)
-        #    mesh_label = pheno
-        #except:
-           # try:
-          #      mesh_label = query.retrieve_mesh_descriptor(pheno)
-         #       mesh_id = pheno
-        #    except:
+        mesh_id, mesh_label = pull_mesh(pheno)
                 
         # Pull taxonomy id and label
-        #tax_id, tax_label = query.retrieve_tax_info(genus)
+        tax_id, tax_label = query.retrieve_tax_info(genus)
+
         # Run analysis
         test_pheno_genus(
             mesh_id,
@@ -229,5 +261,9 @@ def main():
         )
 
     # Process CSV
-    if is_csv == True:
-        process_csv(csv, transf, alt, outdir)
+    #if is_csv == True:
+    #    process_csv(csv, transf, alt, outdir)
+
+
+if __name__ == "__main__":
+    main()
