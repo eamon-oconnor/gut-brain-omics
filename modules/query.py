@@ -90,14 +90,17 @@ def retrieve_tax_info(tax_in):
 
         return(tax_id, tax_name)
     else:
-        raise Exception(f'NIH Taxonomy ID or name \'{tax_in}\' not found.')
+        print(f'NIH Taxonomy ID or name \'{tax_in}\' not found.')
+        raise Exception
 
 
-def retrieve_data(mesh_id, tax_id):
+def retrieve_data(mesh_id, tax_id, mesh_label, tax_label):
     """
     Retrieves gut microbiome abundance data of given species/genus associated with given phenotype (courtesy of GMrepo)
     @param mesh_id: MeSH ID of phenotype (see NIH)
     @param tax_id: NCBI taxonomy ID of species/genus
+    @param mesh_label: Descriptive name of phenotype (Depression, Anxiety, etc.)
+    @param tax_label: Scientific name of species/genus
     @return disease_data: relative abundances of the species/genus of interests in all samples of phenotype (vector)
     @return health_data: relative abundances of the species/genus of interests in all samples of Health (vector)
     """
@@ -121,7 +124,8 @@ def retrieve_data(mesh_id, tax_id):
             return(disease_data.values.flatten(), health_data.values.flatten())
         else:
             # Raise if unable to pull data
-            raise Exception("MeSH ID or NCBI ID not found")
+            print(f"{mesh_label} and/or {tax_label} not found in GMRepo database.")
+            raise Exception
     else:
         # Print and exit if unable to connect to API
         print(f"Unable to connect to database. Status code {data.status_code}")

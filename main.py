@@ -29,7 +29,7 @@ def test_pheno_genus(mesh_id,
     @return None
     """
     # Retrieve data
-    disease_data, health_data = query.retrieve_data(mesh_id, tax_id)
+    disease_data, health_data = query.retrieve_data(mesh_id, tax_id, mesh_label, tax_label)
 
     # Break if data unable to be retrieved
     if disease_data is None or health_data is None:
@@ -93,8 +93,8 @@ def pull_mesh(mesh):
                 mesh_id = query.retrieve_mesh_id(mesh)
                 mesh_label = mesh
             except:
-                print(f'Invalid MeSH label or ID')
-                sys.exit()
+                print(f'MeSH label or ID {mesh} not found.')
+                raise Exception
     else:
         # Likely MeSH label input
         try:
@@ -106,13 +106,13 @@ def pull_mesh(mesh):
                 mesh_label = query.retrieve_mesh_descriptor(mesh)
                 mesh_id = mesh
             except:
-                print(f'Invalid MeSH label or ID')
-                sys.exit()
+                print(f'MeSH label or ID {mesh} not found.')
+                raise Exception
     
     return mesh_id, mesh_label
 
 
-def process_csv(csv):
+def process_csv(csv, transformation, alternative, out_dir):
     """
     Loop through given CSV, analyze contained phenotypes and genera
     @param csv: Directory of input CSV
@@ -129,11 +129,34 @@ def process_csv(csv):
         return
 
     # Check that Phenotype and Genus columns exist
-    #if set('Phenotype','Genus').issubset(df.columns):
+    if set('Phenotype','Genus').issubset(df.columns):
         # Loop through df
-        #for index, row in df.iterrows():
-    #else:
-    #    print(f'Input CSV must include columns labeled \'Phenotype\' and \'Genus\'')
+        for index, row in df.iterrows():
+            try:
+                # Set phenotype and genus
+                pheno = row['Phenotype']
+                genus = row['Genus']
+
+                # Pull mesh id and label
+                mesh_id, mesh_label = pull_mesh(pheno)
+                        
+                # Pull taxonomy id and label
+                tax_id, tax_label = query.retrieve_tax_info(genus)
+
+                # Run analysis
+                test_pheno_genus(
+                    mesh_id,
+                    mesh_label,
+                    tax_id,
+                    tax_label,
+                    transformation,
+                    alternative,
+                    out_dir
+                )
+            except:
+                pass
+    else:
+        print(f'Input CSV must include columns labeled \'Phenotype\' and \'Genus\'')
 
 
 def get_fh_argparse():
@@ -243,26 +266,29 @@ def main():
 
     # Process input Pheno/Genus pair
     if is_pg == True:
-        # Pull mesh id and label
-        mesh_id, mesh_label = pull_mesh(pheno)
-                
-        # Pull taxonomy id and label
-        tax_id, tax_label = query.retrieve_tax_info(genus)
+        try:
+            # Pull mesh id and label
+            mesh_id, mesh_label = pull_mesh(pheno)
+                    
+            # Pull taxonomy id and label
+            tax_id, tax_label = query.retrieve_tax_info(genus)
 
-        # Run analysis
-        test_pheno_genus(
-            mesh_id,
-            mesh_label,
-            tax_id,
-            tax_label,
-            transf,
-            alt,
-            outdir
-        )
+            # Run analysis
+            test_pheno_genus(
+                mesh_id,
+                mesh_label,
+                tax_id,
+                tax_label,
+                transf,
+                alt,
+                outdir
+            )
+        except:
+            pass
 
     # Process CSV
-    #if is_csv == True:
-    #    process_csv(csv, transf, alt, outdir)
+    if is_csv == True:
+        process_csv(csv, transf, alt, outdir)
 
 
 if __name__ == "__main__":
