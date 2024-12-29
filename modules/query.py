@@ -4,6 +4,7 @@ docstring
 import json
 import requests
 import pandas as pd
+import sys
 
 
 def retrieve_mesh_id(mesh_descriptor):
@@ -30,11 +31,12 @@ def retrieve_mesh_id(mesh_descriptor):
             mesh_id = mesh_url[-7:]
             return mesh_id
         else:
-            print(f"No MeSH ID found for descriptor: {mesh_descriptor}")
-            return None
+            # Raise if unable to find MeSH ID
+            raise Exception(f"No MeSH ID found for descriptor: {mesh_descriptor}")
     else:
-        print(f"Error: {response.status_code}")
-        return None
+        # Print and exit if unable to connect to API
+        print(f"Unable to connect to database. Status code {response.status_code}")
+        sys.exit()
 
 
 def retrieve_mesh_descriptor(mesh_id):
@@ -59,11 +61,12 @@ def retrieve_mesh_descriptor(mesh_id):
             mesh_descriptor = data[0]
             return mesh_descriptor
         else:
-            print(f"MeSH ID \'{mesh_id}\' not found")
-            return None
+            # Raise if unable to find MeSH ID
+            raise Exception(f"MeSH ID \'{mesh_id}\' not found")
     else:
-        print(f"Error: {response.status_code}")
-        return None
+        # Print and exit if unable to connect to API
+        print(f"Unable to connect to database. Status code {response.status_code}")
+        sys.exit()
 
 
 def retrieve_tax_info(tax_in):
@@ -87,8 +90,7 @@ def retrieve_tax_info(tax_in):
 
         return(tax_id, tax_name)
     else:
-        print(f'NIH Taxonomy ID or name \'{tax_in}\' not found.')
-        return None, None
+        raise Exception(f'NIH Taxonomy ID or name \'{tax_in}\' not found.')
 
 
 def retrieve_data(mesh_id, tax_id):
@@ -114,7 +116,13 @@ def retrieve_data(mesh_id, tax_id):
         # Select health abundance data
         health_data = pd.DataFrame(data.json().get('abundant_data_for_health'))
 
-        return(disease_data.values.flatten(), health_data.values.flatten())
-
+        # Check that data was successfully retrieved
+        if len(disease_data) > 0 and len(health_data) > 0:
+            return(disease_data.values.flatten(), health_data.values.flatten())
+        else:
+            # Raise if unable to pull data
+            raise Exception("MeSH ID or NCBI ID not found")
     else:
-        return None
+        # Print and exit if unable to connect to API
+        print(f"Unable to connect to database. Status code {data.status_code}")
+        sys.exit()

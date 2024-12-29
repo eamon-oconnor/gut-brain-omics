@@ -7,7 +7,8 @@ import argparse
 import pandas as pd
 import scipy.stats as stats
 import statsmodels.api as sm 
-import pylab as py 
+import pylab as py
+import sys
 
 
 def test_pheno_genus(mesh_id,
@@ -71,6 +72,30 @@ def test_pheno_genus(mesh_id,
     print(f'The mean relative abundance of {tax_label} in the health group is {round(health_mean,3)}, with a standard deviation of {round(health_stdev,3)}.')
     print(f'A Welch\'s t-test of {tax_label} abundance between the {mesh_label} group and healthy group produced a p-value of {p_welch:.3e}.')
     print(f'A Mann-Whitney U test of {tax_label} abundance between the {mesh_label} group and healthy group produced a p-value of {p_mw:.3e}.')
+
+
+def process_csv(csv):
+    """
+    Loop through given CSV, analyze contained phenotypes and genera
+    @param csv: Directory of input CSV
+    @param transformation: Type of transformation to apply to data. Expects 'log10', 'ln', 'boxcox'
+    @param alternative: Alternative hypothesis of comparison. Expects 'two-sided', 'greater', 'less'
+    @param out_dir: directory to write plots to
+    @return None
+    """
+    # Read to dataframe (try/except)
+    try:
+        df = pd.read_csv(csv)
+    except:
+        print(f'Input CSV directory does not exist or is not a CSV.')
+        return
+
+    # Check that Phenotype and Genus columns exist
+    #if set('Phenotype','Genus').issubset(df.columns):
+        # Loop through df
+        #for index, row in df.iterrows():
+    #else:
+    #    print(f'Input CSV must include columns labeled \'Phenotype\' and \'Genus\'')
 
 
 def get_fh_argparse():
@@ -161,10 +186,48 @@ def main():
     transf = args.transformation
     alt = args.alternative
     
+    # Check if a CSV was given
+    if csv is None:
+        is_csv = False
+    else:
+        is_csv = True
     
+    # Check if a pheno/genus pair was given
+    if pheno is None or genus is None:
+        is_pg = False
+    else:
+        is_pg = True
 
-    # Convert csv to df
-    df = pd.read_csv(csv_fh)
+    # Exit if no CSV and no pheno/genus pair
+    if is_csv == False and is_pg == False:
+        print(f'Please input either a CSV filepath or a phenotype/genus pair.')
+        sys.exit()
 
-    # Loop through df rows
-    #for index, row in df.iterrows():
+    # Process input Pheno/Genus pair
+    if is_pg == True:
+        # Pull mesh id and label
+        #try:
+        #    mesh_id = query.retrieve_mesh_id(pheno)
+        #    mesh_label = pheno
+        #except:
+           # try:
+          #      mesh_label = query.retrieve_mesh_descriptor(pheno)
+         #       mesh_id = pheno
+        #    except:
+                
+        # Pull taxonomy id and label
+        #tax_id, tax_label = query.retrieve_tax_info(genus)
+        # Run analysis
+        test_pheno_genus(
+            mesh_id,
+            mesh_label,
+            tax_id,
+            tax_label,
+            transf,
+            alt,
+            outdir
+        )
+
+    # Process CSV
+    if is_csv == True:
+        process_csv(csv, transf, alt, outdir)
