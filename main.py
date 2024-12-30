@@ -129,7 +129,7 @@ def process_csv(csv, transformation, alternative, out_dir):
         return
 
     # Check that Phenotype and Genus columns exist
-    if set('Phenotype','Genus').issubset(df.columns):
+    if {'Phenotype','Genus'}.issubset(df.columns):
         # Loop through df
         for index, row in df.iterrows():
             try:

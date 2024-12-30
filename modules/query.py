@@ -124,7 +124,7 @@ def retrieve_data(mesh_id, tax_id, mesh_label, tax_label):
             return(disease_data.values.flatten(), health_data.values.flatten())
         else:
             # Raise if unable to pull data
-            print(f"{mesh_label} and/or {tax_label} not found in GMRepo database.")
+            print(f"{mesh_label} and {tax_label} interaction not found in GMRepo database.")
             raise Exception
     else:
         # Print and exit if unable to connect to API
