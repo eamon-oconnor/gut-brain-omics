@@ -1,6 +1,8 @@
 """
 Takes one or more pairs of disease phenotype and bacteria species/genus
-of the gut microbiome. Sources data from the GMrepo database, 
+of the gut microbiome. Performs a Welch's t-test and Mann-Whitney U test
+between the phenotype data and a healthy control, and plots QQ plots and 
+histograms for the two datasets. Sources data from the GMrepo database.
 """
 
 from modules import utils, query
