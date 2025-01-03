@@ -1,5 +1,6 @@
 """
-docstring
+Module including functions able to query APIs. Includes the MeSH
+RDF API, Ensembl REST API, and GMrepo RESTful API.
 """
 import json
 import requests
