@@ -2,7 +2,8 @@
 Takes one or more pairs of disease phenotype and bacteria species/genus
 of the gut microbiome. Performs a Welch's t-test and Mann-Whitney U test
 between the phenotype data and a healthy control, and plots QQ plots and 
-histograms for the two datasets. Sources data from the GMrepo database.
+histograms for the two datasets. Also calculates mean and standard deviation
+relative abundance for the two datasets. Sources data from the GMrepo database.
 """
 
 from modules import utils, query
@@ -26,7 +27,7 @@ def test_pheno_genus(mesh_id,
     @param mesh_label: Descriptive name of phenotype (Depression, Anxiety, etc.)
     @param tax_id: NIH taxonomy ID of species/genus
     @param tax_label: Scientific name of species/genus
-    @param transformation: Type of transformation to apply to data. Expects 'log10', 'ln', 'boxcox'
+    @param transformation: Type of transformation to apply to data. Expects 'log10', 'ln', 'boxcox', 'None'
     @param alternative: Alternative hypothesis of comparison. Expects 'two-sided', 'greater', 'less'
     @param out_dir: directory to write plots to
     @return None

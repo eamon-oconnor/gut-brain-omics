@@ -22,7 +22,7 @@ def transform(data, transformation):
         data_transformed = np.log(data)
     elif transformation == 'boxcox':
         data_transformed, data_lambda = stats.boxcox(data)
-    elif transformation == None:
+    elif transformation == 'None':
         data_transformed=data
     else:
         print(f'Invalid transformation type \'{transformation}\'')
