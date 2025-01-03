@@ -1,28 +1,11 @@
 """
-docstring placeholder
+Module including tools to perform analyses of given data. Analyses include
+normality transformations, basic statistics, histogram plotting.
 """
-import pandas as pd
 import numpy as np
 import statistics
 import matplotlib.pyplot as plt
 import scipy.stats as stats
-
-
-def df_to_dict(data):
-    """
-    Converts dataframe to dictionary of lists with each column name being a key
-    @param csv_path: absolute or relative filepath to csv file
-    @return: csv_dict
-    """
-    csv_dict = {}
-
-    df = pd.DataFrame(data)
-
-    # Loop through dataframe
-    for column, data in df.iteritems():
-        csv_dict[column] = data
-    
-    return csv_dict
 
 
 def transform(data, transformation):
