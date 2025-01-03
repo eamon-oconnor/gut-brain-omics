@@ -1,5 +1,6 @@
 """
-docstring placeholder
+Takes one or more pairs of disease phenotype and bacteria species/genus
+of the gut microbiome. Sources data from the GMrepo database, 
 """
 
 from modules import utils, query
