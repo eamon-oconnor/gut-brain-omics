@@ -1,6 +1,4 @@
-# Project Title
-
-gut-brain-omics
+# gut-brain-omics
 
 ## Description
 
